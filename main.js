@@ -1,3 +1,4 @@
+const express = require("express");
 const fs = require("fs").promises;
 
 class ProductManager {
@@ -66,7 +67,10 @@ class ProductManager {
       const index = arrayProductos.findIndex((item) => item.id === id);
 
       if (index !== -1) {
-        arrayProductos.splice(index, 1, { ...arrayProductos[index], ...productoActualizado });
+        arrayProductos.splice(index, 1, {
+          ...arrayProductos[index],
+          ...productoActualizado,
+        });
         await this.guardarArchivo(arrayProductos);
       } else {
         console.log("No se encontró el producto");
@@ -111,9 +115,41 @@ class ProductManager {
   }
 }
 
-// testing del metodo usado
+const app = express();
+const port = 8080;
 const manager = new ProductManager("./productos.json");
 
+app.get("/", (req, res) => {
+  res.send("¡Bienvenido a la aplicación de gestión de productos!");
+});
+
+app.get("/products", async (req, res) => {
+  const limit = parseInt(req.query.limit) || undefined;
+  const allProducts = await manager.getProducts();
+
+  if (limit) {
+    res.json(allProducts.slice(0, limit));
+  } else {
+    res.json(allProducts);
+  }
+});
+
+app.get("/products/:id", async (req, res) => {
+  const productId = parseInt(req.params.id);
+  const product = await manager.getProductById(productId);
+
+  if (product) {
+    res.json(product);
+  } else {
+    res.status(404).json({ error: "Producto no encontrado" });
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
+});
+
+// testing del método usado
 (async () => {
   await manager.getProducts();
 
