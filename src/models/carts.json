@@ -34,59 +34,5 @@
     "img": "url_imagen_vegetariana",
     "code": "veg004",
     "stock": 15
-  },
-  {
-    "id": 5,
-    "title": "Pizza BBQ",
-    "description": "Salsa BBQ, pollo, cebolla y maíz",
-    "price": 14.99,
-    "img": "url_imagen_bbq",
-    "code": "bbq005",
-    "stock": 25
-  },
-  {
-    "id": 6,
-    "title": "Pizza Mexicana",
-    "description": "Tomate, mozzarella, carne molida, jalapeños y guacamole",
-    "price": 15.99,
-    "img": "url_imagen_mexicana",
-    "code": "mex006",
-    "stock": 17
-  },
-  {
-    "id": 7,
-    "title": "Pizza de Queso de Cabra",
-    "description": "Tomate, mozzarella, queso de cabra y cebolla caramelizada",
-    "price": 16.99,
-    "img": "url_imagen_cabra",
-    "code": "cab007",
-    "stock": 20
-  },
-  {
-    "id": 8,
-    "title": "Pizza de Mariscos",
-    "description": "Salsa de tomate, mozzarella, camarones, mejillones y calamares",
-    "price": 18.99,
-    "img": "url_imagen_mariscos",
-    "code": "mar008",
-    "stock": 16
-  },
-  {
-    "id": 9,
-    "title": "Pizza Caprese",
-    "description": "Tomate, mozzarella, tomates cherry y albahaca fresca",
-    "price": 17.99,
-    "img": "url_imagen_caprese",
-    "code": "cap009",
-    "stock": 19
-  },
-  {
-    "id": 10,
-    "title": "Pizza Carnívora",
-    "description": "Tomate, mozzarella, pepperoni, salchichas y jamón",
-    "price": 19.99,
-    "img": "url_imagen_carnivora",
-    "code": "car010",
-    "stock": 21
   }
 ]
