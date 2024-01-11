@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const ProductManager = require("../controllers/product-manager.js");
-const cartManager = new ProductManager("./src/models/carrito.json");
+const productManager = new ProductManager("./src/models/carts.json");
 
 // Rutas:
 router.get("/carts", async (req, res) => {
   try {
-    const carts = await cartManager.getProducts(); // Cambiado a cartManager
+    const carts = await productManager.getProducts(); // Cambiado a productManager
     res.json(carts);
   } catch (error) {
     console.error("Error al obtener el carrito", error);
@@ -18,7 +18,7 @@ router.get("/carts", async (req, res) => {
 router.post("/carts", async (req, res) => {
   try {
     const nuevoCarrito = req.body;
-    await cartManager.addProduct(nuevoCarrito); // Cambiado a cartManager
+    await productManager.addProduct(nuevoCarrito); // Cambiado a productManager
     res.json({ message: "Carrito creado correctamente" });
   } catch (error) {
     console.error("Error al crear carrito", error);
@@ -32,7 +32,9 @@ router.get("/carts/:cid", async (req, res) => {
   const id = req.params.cid;
 
   try {
-    const productosEnCarrito = await cartManager.getCartProducts(parseInt(id));
+    const productosEnCarrito = await productManager.getCartProducts(
+      parseInt(id)
+    );
     res.json(productosEnCarrito);
   } catch (error) {
     console.error("Error al obtener productos del carrito", error);
@@ -47,7 +49,7 @@ router.post("/carts/:cid/product/:pid", async (req, res) => {
   const productoId = req.params.pid;
 
   try {
-    await cartManager.addProductToCart(
+    await productManager.addProductToCart(
       parseInt(carritoId),
       parseInt(productoId)
     );
