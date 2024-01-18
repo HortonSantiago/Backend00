@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
-
 const ProductManager = require("../controllers/product-manager.js");
 const productManager = new ProductManager("./src/models/productos.json");
+
+// Importa el módulo de socket.io y obtén la instancia del servidor
+const socketIO = require("socket.io");
+const io = socketIO();
 
 // Rutas:
 router.get("/products", async (req, res) => {
@@ -14,6 +17,9 @@ router.get("/products", async (req, res) => {
     } else {
       res.json(productos);
     }
+
+    // Envía la lista de productos a través del websocket
+    io.emit("productList", productos);
   } catch (error) {
     console.error("Error al obtener productos", error);
     res.status(500).json({
@@ -48,6 +54,10 @@ router.post("/products", async (req, res) => {
   try {
     await productManager.addProduct(nuevoProducto);
     res.json({ message: "Producto agregado correctamente" });
+
+    // Envía la lista de productos actualizada a través del websocket
+    const productos = await productManager.getProducts();
+    io.emit("productList", productos);
   } catch (error) {
     console.error("Error al agregar producto", error);
     res.status(500).json({
@@ -63,6 +73,10 @@ router.put("/products/:pid", async (req, res) => {
   try {
     await productManager.updateProduct(parseInt(id), productoActualizado);
     res.json({ message: "Producto actualizado correctamente" });
+
+    // Envía la lista de productos actualizada a través del websocket
+    const productos = await productManager.getProducts();
+    io.emit("productList", productos);
   } catch (error) {
     console.error("Error al actualizar producto", error);
     res.status(500).json({
@@ -77,6 +91,10 @@ router.delete("/products/:pid", async (req, res) => {
   try {
     await productManager.deleteProduct(parseInt(id));
     res.json({ message: "Producto eliminado correctamente" });
+
+    // Envía la lista de productos actualizada a través del websocket
+    const productos = await productManager.getProducts();
+    io.emit("productList", productos);
   } catch (error) {
     console.error("Error al eliminar producto", error);
     res.status(500).json({
@@ -85,4 +103,4 @@ router.delete("/products/:pid", async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = { router, io }; // Exporta también la instancia de socket.io

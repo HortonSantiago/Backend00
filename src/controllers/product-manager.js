@@ -6,9 +6,14 @@ class ProductManager {
   constructor(path) {
     this.products = [];
     this.path = path;
+    this.io = null; // Socket.IO instance
   }
 
-  //Métodos:
+  // Métodos:
+
+  attachIO(io) {
+    this.io = io;
+  }
 
   async addProduct(nuevoObjeto) {
     let { title, description, price, img, code, stock } = nuevoObjeto;
@@ -37,16 +42,19 @@ class ProductManager {
 
     this.products.push(newProduct);
 
-    //Guardamos el array en el archivo:
-
+    // Guardamos el array en el archivo:
     await this.guardarArchivo(this.products);
+
+    // Emitimos un evento de socket para la adición de productos
+    if (this.io) {
+      this.io.emit("productAdded");
+    }
   }
 
   async getProducts() {
     try {
-      //Debe tener un método getProducts, el cual debe leer el archivo de productos y devolver todos los productos en formato de arreglo.
-
-      const arrayProductos = this.leerArchivo();
+      // Debe tener un método getProducts, el cual debe leer el archivo de productos y devolver todos los productos en formato de arreglo.
+      const arrayProductos = await this.leerArchivo();
       return arrayProductos;
     } catch (error) {
       console.log("Error al leer el archivo", error);
@@ -69,7 +77,7 @@ class ProductManager {
     }
   }
 
-  //Nuevos metodos desafio 2:
+  // Nuevos metodos desafio 2:
 
   async leerArchivo() {
     try {
@@ -89,7 +97,7 @@ class ProductManager {
     }
   }
 
-  //Actualizamos algun producto:
+  // Actualizamos algun producto:
   async updateProduct(id, productoActualizado) {
     try {
       const arrayProductos = await this.leerArchivo();
@@ -97,7 +105,7 @@ class ProductManager {
       const index = arrayProductos.findIndex((item) => item.id === id);
 
       if (index !== -1) {
-        //Puedo usar el método de array splice para reemplazar el objeto en la posicion del index:
+        // Puedo usar el método de array splice para reemplazar el objeto en la posición del index:
         arrayProductos.splice(index, 1, productoActualizado);
         await this.guardarArchivo(arrayProductos);
       } else {
@@ -109,4 +117,4 @@ class ProductManager {
   }
 }
 
-module.exports = ProductManager;
+module.exports = ProductManager; // Exporta la clase ProductManager
