@@ -1,19 +1,13 @@
 const express = require("express");
 const router = express.Router();
-
 const ProductManager = require("../controllers/product-manager.js");
-const productManager = new ProductManager("./src/models/productos.json");
+const productManager = new ProductManager("./src/models/products.json");
 
-// Rutas:
-router.get("/products", async (req, res) => {
+// Rutas
+router.get("/", async (req, res) => {
   try {
-    const limit = req.query.limit;
     const productos = await productManager.getProducts();
-    if (limit) {
-      res.json(productos.slice(0, limit));
-    } else {
-      res.json(productos);
-    }
+    res.json(productos);
   } catch (error) {
     console.error("Error al obtener productos", error);
     res.status(500).json({
@@ -22,7 +16,7 @@ router.get("/products", async (req, res) => {
   }
 });
 
-router.get("/products/:pid", async (req, res) => {
+router.get("/:pid", async (req, res) => {
   const id = req.params.pid;
 
   try {
@@ -42,7 +36,7 @@ router.get("/products/:pid", async (req, res) => {
   }
 });
 
-router.post("/products", async (req, res) => {
+router.post("/", async (req, res) => {
   const nuevoProducto = req.body;
 
   try {
@@ -56,7 +50,7 @@ router.post("/products", async (req, res) => {
   }
 });
 
-router.put("/products/:pid", async (req, res) => {
+router.put("/:pid", async (req, res) => {
   const id = req.params.pid;
   const productoActualizado = req.body;
 
@@ -71,7 +65,7 @@ router.put("/products/:pid", async (req, res) => {
   }
 });
 
-router.delete("/products/:pid", async (req, res) => {
+router.delete("/:pid", async (req, res) => {
   const id = req.params.pid;
 
   try {

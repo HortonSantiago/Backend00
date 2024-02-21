@@ -1,110 +1,93 @@
 const fs = require("fs").promises;
 
 class ProductManager {
-  static ultId = 0;
-
   constructor(path) {
-    this.products = [];
     this.path = path;
-  }
-
-  //Métodos:
-
-  async addProduct(nuevoObjeto) {
-    let { title, description, price, img, code, stock } = nuevoObjeto;
-
-    if (!title || !description || !price || !img || !code || !stock) {
-      console.log(
-        "Todos los campos son obligatorios, completalo o moriras en 24 hs"
-      );
-      return;
-    }
-
-    if (this.products.some((item) => item.code === code)) {
-      console.log("El codigo debe ser unico, rata de dos patas!");
-      return;
-    }
-
-    const newProduct = {
-      id: ++ProductManager.ultId,
-      title,
-      description,
-      price,
-      img,
-      code,
-      stock,
-    };
-
-    this.products.push(newProduct);
-
-    //Guardamos el array en el archivo:
-
-    await this.guardarArchivo(this.products);
   }
 
   async getProducts() {
     try {
-      //Debe tener un método getProducts, el cual debe leer el archivo de productos y devolver todos los productos en formato de arreglo.
-
-      const arrayProductos = this.leerArchivo();
-      return arrayProductos;
+      const productos = await this.leerArchivo();
+      return productos.length > 0
+        ? productos
+        : { error: "No hay productos disponibles" };
     } catch (error) {
-      console.log("Error al leer el archivo", error);
+      console.log("Error al obtener los productos", error);
+      return { error: "Error interno del servidor" };
     }
   }
 
   async getProductById(id) {
     try {
-      const arrayProductos = await this.leerArchivo();
-      const buscado = arrayProductos.find((item) => item.id === id);
-
-      if (!buscado) {
-        console.log("Producto no encontrado");
-      } else {
-        console.log("Siii, lo encontramos! ");
-        return buscado;
-      }
+      const productos = await this.leerArchivo();
+      const producto = productos.find((producto) => producto.id === id);
+      return producto ? producto : { error: "Producto no encontrado" };
     } catch (error) {
-      console.log("Error al leer el archivo ", error);
+      console.log("Error al obtener el producto", error);
+      return { error: "Error interno del servidor" };
     }
   }
 
-  //Nuevos metodos desafio 2:
+  async addProduct(nuevoProducto) {
+    try {
+      const productos = await this.leerArchivo();
+      const id =
+        productos.length > 0 ? productos[productos.length - 1].id + 1 : 1;
+      const productoNuevo = { id, ...nuevoProducto };
+      productos.push(productoNuevo);
+      await this.guardarArchivo(productos);
+      return { message: "Producto agregado correctamente" };
+    } catch (error) {
+      console.log("Error al agregar el producto", error);
+      return { error: "Error interno del servidor" };
+    }
+  }
+
+  async updateProduct(id, productoActualizado) {
+    try {
+      let productos = await this.leerArchivo();
+      const index = productos.findIndex((producto) => producto.id === id);
+      if (index !== -1) {
+        productos[index] = { ...productos[index], ...productoActualizado };
+        await this.guardarArchivo(productos);
+        return { message: "Producto actualizado correctamente" };
+      } else {
+        return { error: "Producto no encontrado" };
+      }
+    } catch (error) {
+      console.log("Error al actualizar el producto", error);
+      return { error: "Error interno del servidor" };
+    }
+  }
+
+  async deleteProduct(id) {
+    try {
+      let productos = await this.leerArchivo();
+      productos = productos.filter((producto) => producto.id !== id);
+      await this.guardarArchivo(productos);
+      return { message: "Producto eliminado correctamente" };
+    } catch (error) {
+      console.log("Error al eliminar el producto", error);
+      return { error: "Error interno del servidor" };
+    }
+  }
 
   async leerArchivo() {
     try {
       const respuesta = await fs.readFile(this.path, "utf-8");
-      const arrayProductos = JSON.parse(respuesta);
-      return arrayProductos;
+      const productos = JSON.parse(respuesta);
+      return productos;
     } catch (error) {
-      console.log("Eerror al leer un archivo", error);
+      console.log("Error al leer el archivo", error);
+      return [];
     }
   }
 
-  async guardarArchivo(arrayProductos) {
+  async guardarArchivo(productos) {
     try {
-      await fs.writeFile(this.path, JSON.stringify(arrayProductos, null, 2));
+      await fs.writeFile(this.path, JSON.stringify(productos, null, 2));
     } catch (error) {
       console.log("Error al guardar el archivo", error);
-    }
-  }
-
-  //Actualizamos algun producto:
-  async updateProduct(id, productoActualizado) {
-    try {
-      const arrayProductos = await this.leerArchivo();
-
-      const index = arrayProductos.findIndex((item) => item.id === id);
-
-      if (index !== -1) {
-        //Puedo usar el método de array splice para reemplazar el objeto en la posicion del index:
-        arrayProductos.splice(index, 1, productoActualizado);
-        await this.guardarArchivo(arrayProductos);
-      } else {
-        console.log("no se encontró el producto");
-      }
-    } catch (error) {
-      console.log("Error al actualizar el producto", error);
     }
   }
 }
