@@ -13,6 +13,7 @@ app.set("views", "./src/views");
 
 // Routing
 app.use("/", viewsRouter);
+app.use(express.static("./src/public"));
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
